@@ -36,10 +36,10 @@ class MainActivity : Activity() {
     lateinit var heartRateSensor : Sensor
 
     lateinit var cw : CSVWrite
-    var header = "year,month,date,hour,min,sec,millis,accX,accY,accZ,HR\n"
+//    var header = "year,month,date,hour,min,sec,millis,accX,accY,accZ,HR\n"
 //    var header = "year,month,date,hour,min,sec,millis,accX,accY,accZ,gyroX,gyroY,gyroZ,HR\n"
 //    var header = "year,month,date,hour,min,sec,millis,accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ,HR\n"
-//    var header = "year,month,date,hour,min,sec,millis,accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ,graX,graY,graZ,HR\n"
+    var header = "year,month,date,hour,min,sec,millis,accX,accY,accZ,gyroX,gyroY,gyroZ,magX,magY,magZ,graX,graY,graZ,HR\n"
     var data = ""
     var hr : Float = 0F
     var accX: Float = 0.0f
@@ -74,15 +74,15 @@ class MainActivity : Activity() {
         accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         accelerometerListener = AccListener()
         sensorManager.registerListener(accelerometerListener, accelerometerSensor, SensorManager.SENSOR_DELAY_FASTEST)
-//        gyrometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-//        gyrometerListener = GyroListener()
-//        sensorManager.registerListener(gyrometerListener, gyrometerSensor, SensorManager.SENSOR_DELAY_FASTEST)
-//        magnetometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
-//        magnetometerListener = MagListener()
-//        sensorManager.registerListener(magnetometerListener, magnetometerSensor, SensorManager.SENSOR_DELAY_FASTEST)
-//        gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
-//        gravityListener = GravityListener()
-//        sensorManager.registerListener(gravityListener, gravitySensor, SensorManager.SENSOR_DELAY_FASTEST)
+        gyrometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        gyrometerListener = GyroListener()
+        sensorManager.registerListener(gyrometerListener, gyrometerSensor, SensorManager.SENSOR_DELAY_FASTEST)
+        magnetometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+        magnetometerListener = MagListener()
+        sensorManager.registerListener(magnetometerListener, magnetometerSensor, SensorManager.SENSOR_DELAY_FASTEST)
+        gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
+        gravityListener = GravityListener()
+        sensorManager.registerListener(gravityListener, gravitySensor, SensorManager.SENSOR_DELAY_FASTEST)
         heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE)
         heartRateListener = HeartRateListener()
         sensorManager.registerListener(heartRateListener, heartRateSensor, SensorManager.SENSOR_DELAY_FASTEST)
@@ -102,28 +102,28 @@ class MainActivity : Activity() {
                     val calendar = getInstance()
 
                     // data
-                    if (calendar.timeInMillis%16 < 2 && !isTime) {
-                        Log.d(TAG, "hr: $hr   accX: $accX   count: $count")
-                        data += dataCollectedDate() + "$accX,$accY,$accZ,$hr\n"
+                    if (calendar.timeInMillis%15 < 2 && !isTime) {
+//                        Log.d(TAG, "hr: $hr   accX: $accX   count: $count")
+//                        data += dataCollectedDate() + "$accX,$accY,$accZ,$hr\n"
 //                        Log.d(TAG, "hr: $hr   accX: $accX  gyroX: $gyroX   count: $count")
 //                        data += dataCollectedDate() + "$accX,$accY,$accZ,$gyroX,$gyroY,$gyroZ,$hr\n"
 //                        Log.d(TAG, "hr: $hr   accX: $accX  gyroX: $gyroX  magX: $magX  count: $count")
 //                        data += dataCollectedDate() + "$accX,$accY,$accZ,$gyroX,$gyroY,$gyroZ,$magX,$magY,$magZ,$hr\n"
-//                        Log.d(TAG, "hr: $hr   accX: $accX  gyroX: $gyroX  magX: $magX  graX: $graX  count: $count")
-//                        data += dataCollectedDate() + "$accX,$accY,$accZ,$gyroX,$gyroY,$gyroZ,$magX,$magY,$magZ,$graX,$graY,$graZ,$hr\n"
+                        Log.d(TAG, "hr: $hr   accX: $accX  gyroX: $gyroX  magX: $magX  graX: $graX  count: $count")
+                        data += dataCollectedDate() + "$accX,$accY,$accZ,$gyroX,$gyroY,$gyroZ,$magX,$magY,$magZ,$graX,$graY,$graZ,$hr\n"
                         isTime = true
                         count++
                     }
-                    if(calendar.timeInMillis%16 > 13){ isTime = false }
+                    if(calendar.timeInMillis%15 > 12){ isTime = false }
                     // write
-                    if(count%(60*60) == 0 && !isWritten) {
+                    if(count%(60*30) == 0 && !isWritten) {
                         cw.writeCsv(data, "SensorData")
                         data = ""
                         isWritten = true
                     }
-                    else { isWritten = false }
+                    if(count%(60*30) > 0) { isWritten = false }
                     // finish
-                    if ( System.currentTimeMillis() - startTime > 1000 * 60 * 11) {
+                    if ( System.currentTimeMillis() - startTime > 1000 * (60 * 11) + 1) {
 //                    if(count == 660 * 10 && !isWritten) {
                         cw.writeCsv(data,"SensorData")
                         finishAffinity()
